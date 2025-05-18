@@ -2,7 +2,7 @@
 
 **Supercharge Your Laravel Development with Advanced CRUD Generation**
 
-`jpu4/laravel-extras` is a powerful Laravel package that provides artisan generators to accelerate your development workflow. It's designed for Laravel 10/11/12+ applications and offers a comprehensive set of tools to generate CRUD operations with a single command.
+`jpu4/laravel-extras` is a powerful Laravel package that provides artisan generators to accelerate your development workflow. It's designed for Laravel 11+ applications and offers a comprehensive set of tools to generate CRUD operations with a single command.
 
 ## ✨ Features
 
