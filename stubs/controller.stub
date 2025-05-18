@@ -1,0 +1,81 @@
+<?php
+
+namespace DummyNamespace;
+
+use DummyNamespace\Models\DummyModel;
+use DummyNamespace\Http\Requests\DummyClassRequest;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\View\View;
+use App\Http\Controllers\Controller;
+
+class DummyClass extends Controller
+{
+    /**
+     * Display a listing of the resource.
+     */
+    public function index(): View
+    {
+        $items = DummyModel::latest()->paginate(10);
+        return view('dummy_table.index', compact('items'));
+    }
+
+    /**
+     * Show the form for creating a new resource.
+     */
+    public function create(): View
+    {
+        return view('dummy_table.create');
+    }
+
+    /**
+     * Store a newly created resource in storage.
+     */
+    public function store(DummyClassRequest $request): RedirectResponse
+    {
+        DummyModel::create($request->validated());
+        
+        return redirect()
+            ->route('dummy_table.index')
+            ->with('success', 'DummyModel created successfully.');
+    }
+
+    /**
+     * Display the specified resource.
+     */
+    public function show(DummyModel $dummyModel): View
+    {
+        return view('dummy_table.show', compact('dummyModel'));
+    }
+
+    /**
+     * Show the form for editing the specified resource.
+     */
+    public function edit(DummyModel $dummyModel): View
+    {
+        return view('dummy_table.edit', compact('dummyModel'));
+    }
+
+    /**
+     * Update the specified resource in storage.
+     */
+    public function update(DummyClassRequest $request, DummyModel $dummyModel): RedirectResponse
+    {
+        $dummyModel->update($request->validated());
+        
+        return redirect()
+            ->route('dummy_table.index')
+            ->with('success', 'DummyModel updated successfully');
+    }
+
+    /**
+     * Remove the specified resource from storage.
+     */
+    public function destroy(DummyModel $dummyModel): RedirectResponse
+    {
+        $dummyModel->delete();
+        
+        return redirect()
+            ->route('dummy_table.index')
+            ->with('success', 'DummyModel deleted successfully');
+    }
+}

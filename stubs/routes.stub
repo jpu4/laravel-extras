@@ -1,0 +1,12 @@
+<?php
+
+use DummyNamespace\DummyClass;
+use Illuminate\Support\Facades\Route;
+
+/*
+|--------------------------------------------------------------------------
+| Web Routes
+|--------------------------------------------------------------------------
+*/
+
+Route::resource('dummy_table', DummyClass::class)->names('dummy_table');
