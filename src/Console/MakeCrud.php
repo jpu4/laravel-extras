@@ -14,13 +14,13 @@ class MakeCrud extends Command
      * @var string
      */
     protected $signature = 'make:crud 
-                            {name : The name of the resource (e.g., Post)}
+                            {names* : The names of the resources (e.g., Post Comment)}
                             {--force : Overwrite existing files}
                             {--m|migration : Create a new migration file}
                             {--c|controller : Create a new controller}
                             {--r|requests : Create form request classes}
-                            {--v|views : Create views}
-                            {--a|all : Generate all CRUD files}';
+                            {--w|views : Create views}
+                            {--a|all : Generate all CRUD files (default)}';
 
     /**
      * The console command description.
@@ -55,34 +55,50 @@ class MakeCrud extends Command
      */
     public function handle()
     {
-        $name = $this->argument('name');
+        $names = $this->argument('names');
         
-        if (!preg_match('/^[a-zA-Z_]+$/', $name)) {
-            $this->error('The name may only contain letters and underscores.');
-            return Command::FAILURE;
+        // If no specific options are provided, default to --all
+        if (!$this->option('migration') && 
+            !$this->option('controller') && 
+            !$this->option('requests') && 
+            !$this->option('views')) {
+            $this->input->setOption('all', true);
         }
         
-        $name = Str::studly($name);
+        $success = true;
         
-        try {
-            $files = $this->laravelExtras->generateCrud($name);
-            
-            $this->info('CRUD generated successfully!');
-            $this->line('');
-            $this->info('Generated files:');
-            
-            foreach ($files as $file) {
-                $this->line("- <info>" . str_replace(base_path(), '', $file) . "</info>");
+        foreach ($names as $name) {
+            if (!preg_match('/^[a-zA-Z_]+$/', $name)) {
+                $this->error("Skipping '$name': Name may only contain letters and underscores.");
+                $success = false;
+                continue;
             }
             
-            $this->line('');
-            $this->info('Don\'t forget to register the routes in your web.php file!');
+            $name = Str::studly($name);
             
-            return Command::SUCCESS;
-        } catch (\Exception $e) {
-            $this->error('Failed to generate CRUD: ' . $e->getMessage());
-            $this->error($e->getTraceAsString());
-            return Command::FAILURE;
+            try {
+                $files = $this->laravelExtras->generateCrud($name);
+                
+                $this->info("✅ CRUD for '$name' generated successfully!");
+                $this->line('');
+                $this->info('📁 Generated files:');
+                
+                foreach ($files as $file) {
+                    $this->line("  - <info>" . str_replace(base_path(), '', $file) . "</info>");
+                }
+                
+                $this->line('');
+            } catch (\Exception $e) {
+                $this->error("❌ Failed to generate CRUD for '$name': " . $e->getMessage());
+                if ($this->getOutput()->isVerbose()) {
+                    $this->error($e->getTraceAsString());
+                }
+                $success = false;
+            }
         }
+        
+        $this->info('🔗 Don\'t forget to register the routes in your web.php file!');
+        
+        return $success ? Command::SUCCESS : Command::FAILURE;
     }
 }
